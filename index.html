@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C963 Quiz App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .question {
+            font-size: 1.4em;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        .option-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: left;
+            font-size: 1.1em;
+            cursor: pointer;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            transition: all 0.2s;
+        }
+        .option-btn:hover {
+            background-color: #e9ecef;
+        }
+        .correct {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+        }
+        .incorrect {
+            background-color: #f8d7da !important;
+            border-color: #f5c6cb !important;
+        }
+        #feedback {
+            font-size: 1.2em;
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        #progress {
+            font-size: 1.1em;
+            color: #666;
+            margin-top: 20px;
+        }
+        #review {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+        }
+        .review-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-left: 4px solid #007bff;
+            background-color: #f8f9fa;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1.1em;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>C963 Quiz App</h1>
+        <div id="question" class="question"></div>
+        <div id="options"></div>
+        <div id="feedback"></div>
+        <div id="progress"></div>
+    </div>
+    <div id="review" class="container" style="display: none;">
+        <h2>Review Incorrect Answers</h2>
+        <div id="review-content"></div>
+        <button onclick="location.reload()">Restart Quiz</button>
+    </div>
+
+    <script>
+        // Converted question bank
+        const questionBank = [
+            // ... (Insert the entire question bank array here from the Python code)
+            // Example structure:
+            {
+                "question": "Which contributor to the Enlightenment identified two key aspects to our existence, liberty and property?",
+                "options": ["John Locke", "Thomas Hobbes", "Jean-Jacques Rousseau", "Voltaire"],
+                "answer": "John Locke"
+            },
+            // ... (All other questions)
+        ];
+
+        class QuizApp {
+            constructor() {
+                this.questions = [];
+                this.currentQuestionIndex = 0;
+                this.score = 0;
+                this.incorrect = 0;
+                this.incorrectQuestions = [];
+                
+                this.initQuiz();
+            }
+
+            initQuiz() {
+                this.questions = this.shuffleArray([...questionBank]);
+                this.renderQuestion();
+            }
+
+            shuffleArray(array) {
+                return array.sort(() => Math.random() - 0.5);
+            }
+
+            renderQuestion() {
+                if (this.currentQuestionIndex >= this.questions.length) {
+                    this.showSummary();
+                    return;
+                }
+
+                const question = this.questions[this.currentQuestionIndex];
+                const options = this.shuffleArray([...question.options]);
+                
+                document.getElementById('question').textContent = question.question;
+                const optionsDiv = document.getElementById('options');
+                optionsDiv.innerHTML = '';
+                
+                options.forEach((option, index) => {
+                    const button = document.createElement('button');
+                    button.className = 'option-btn';
+                    button.textContent = option;
+                    button.onclick = () => this.checkAnswer(option, question.answer);
+                    optionsDiv.appendChild(button);
+                });
+
+                this.updateProgress();
+            }
+
+            checkAnswer(selectedAnswer, correctAnswer) {
+                const buttons = document.getElementsByClassName('option-btn');
+                Array.from(buttons).forEach(button => button.disabled = true);
+
+                if (selectedAnswer === correctAnswer) {
+                    this.score++;
+                    document.getElementById('feedback').innerHTML = 
+                        `<span style="color: green;">Correct! ✅ The answer is: ${correctAnswer}</span>`;
+                    Array.from(buttons).find(b => b.textContent === correctAnswer).classList.add('correct');
+                } else {
+                    this.incorrect++;
+                    this.incorrectQuestions.push({
+                        question: this.questions[this.currentQuestionIndex].question,
+                        yourAnswer: selectedAnswer,
+                        correctAnswer: correctAnswer
+                    });
+                    document.getElementById('feedback').innerHTML = 
+                        `<span style="color: red;">Incorrect ❌ The correct answer was: ${correctAnswer}</span>`;
+                    Array.from(buttons).find(b => b.textContent === selectedAnswer).classList.add('incorrect');
+                    Array.from(buttons).find(b => b.textContent === correctAnswer).classList.add('correct');
+                }
+
+                setTimeout(() => {
+                    this.currentQuestionIndex++;
+                    this.renderQuestion();
+                    document.getElementById('feedback').textContent = '';
+                }, 2000);
+            }
+
+            updateProgress() {
+                document.getElementById('progress').textContent = 
+                    `Question ${this.currentQuestionIndex + 1} of ${this.questions.length} | ` +
+                    `Correct: ${this.score} | Incorrect: ${this.incorrect}`;
+            }
+
+            showSummary() {
+                document.querySelector('.container').style.display = 'none';
+                const review = document.getElementById('review');
+                review.style.display = 'block';
+
+                let reviewHTML = `<p>Final Score: ${this.score} correct, ${this.incorrect} incorrect out of ${this.questions.length}</p>`;
+                
+                if (this.incorrectQuestions.length > 0) {
+                    reviewHTML += '<h3>Incorrect Answers:</h3>';
+                    this.incorrectQuestions.forEach((item, index) => {
+                        reviewHTML += `
+                            <div class="review-item">
+                                <p><strong>Question ${index + 1}:</strong> ${item.question}</p>
+                                <p>Your answer: ${item.yourAnswer}</p>
+                                <p>Correct answer: ${item.correctAnswer}</p>
+                            </div>
+                        `;
+                    });
+                }
+
+                document.getElementById('review-content').innerHTML = reviewHTML;
+            }
+        }
+
+        // Initialize quiz when page loads
+        new QuizApp();
+    </script>
+</body>
+</html>
