@@ -21,8 +21,4 @@ A comprehensive web-based quiz application covering key concepts in U.S. Governm
 Live demo available on GitHub Pages:  
 [Take the Quiz Now!](https://leetmalware.github.io/wgu963.github.io/) <!-- Replace with your actual GitHub Pages URL -->
 
-## Installation 💻
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/your-repo-name.git
