@@ -1,0 +1,23 @@
+
+[
+    {
+        "question": "How does the 14th Amendment affect the powers of the federal judiciary?",
+        "options": [
+            "It grants citizenship to all born or naturalized in the U.S.",
+            "It limits the power of the Supreme Court",
+            "It creates the principle of judicial review",
+            "It grants the president power to override judicial decisions"
+        ],
+        "answer": "It grants citizenship to all born or naturalized in the U.S."
+    },
+    {
+        "question": "What did Marbury v. Madison establish?",
+        "options": [
+            "Judicial Review",
+            "The Bill of Rights",
+            "Presidential Term Limits",
+            "Congressional Apportionment"
+        ],
+        "answer": "Judicial Review"
+    }
+]
